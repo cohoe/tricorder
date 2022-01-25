@@ -222,7 +222,6 @@ dependencies {
             strictly "2.7.0-alpha04"
         }
     }
-
 }
 
 // Run this once to be able to run the application with BUCK

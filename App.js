@@ -29,6 +29,11 @@ import {
 
 import notifee, {EventType} from '@notifee/react-native';
 
+import { AppRegistry } from 'react-native';
+AppRegistry.registerHeadlessTask('SomeTaskName', () =>
+    require('./tasks/BackgroundPoller.js')
+);
+
 const Section = ({children, title}): Node => {
     const isDarkMode = useColorScheme() === 'dark';
     return (
