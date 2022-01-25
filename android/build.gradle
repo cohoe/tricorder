@@ -7,7 +7,7 @@ buildscript {
         // This is some bullshit
         // https://stackoverflow.com/questions/70511000/the-mincompilesdk-31-specified-in-a-dependencys-aar-metadata-this-error-is-s
         // https://stackoverflow.com/questions/69037481/android-app-wont-build-the-mincompilesdk-31-specified-in-a-dependencys-an
-        compileSdkVersion = 31
+        compileSdkVersion = 30
         targetSdkVersion = 30
         ndkVersion = "21.4.7075529"
     }

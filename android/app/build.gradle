@@ -215,6 +215,14 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    // https://stackoverflow.com/questions/69037481/android-app-wont-build-the-mincompilesdk-31-specified-in-a-dependencys-an
+    api(group: "androidx.work", name: "work-runtime") {
+        version {
+            strictly "2.7.0-alpha04"
+        }
+    }
+
 }
 
 // Run this once to be able to run the application with BUCK

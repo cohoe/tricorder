@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import type {Node} from 'react';
 import {
     SafeAreaView,
@@ -27,7 +27,7 @@ import {
     ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-import notifee from '@notifee/react-native';
+import notifee, {EventType} from '@notifee/react-native';
 
 const Section = ({children, title}): Node => {
     const isDarkMode = useColorScheme() === 'dark';
@@ -55,12 +55,81 @@ const Section = ({children, title}): Node => {
     );
 };
 
+notifee.onBackgroundEvent(async ({type, detail}) => {
+    const {notification, pressAction} = detail;
+
+    console.log('WE GOT AN EVENT THING');
+    console.log(type);
+    console.log(detail);
+    console.log('END EVENT THINGY');
+
+    // Check if the user pressed the "Mark as read" action
+    if (type === EventType.ACTION_PRESS && pressAction.id === 'mark-as-read') {
+        // Update external API
+        // await fetch(`https://my-api.com/chat/${notification.data.chatId}/read`, {
+        //     method: 'POST',
+        // });
+
+        // Remove the notification
+        await notifee.cancelNotification(notification.id);
+    }
+});
+
 const App: () => Node = () => {
     const isDarkMode = useColorScheme() === 'dark';
+    const [loading, setLoading] = useState(true);
+
+    // Bootstrap sequence function
+    async function bootstrap() {
+        console.log("BOOTSTRAPPING")
+        const initialNotification = await notifee.getInitialNotification();
+
+        if (initialNotification) {
+            console.log('Notification caused application to open', initialNotification.notification);
+            console.log('Press action used to open the app', initialNotification.pressAction);
+            // console.log("POOP")
+            // console.log(initialNotification)
+            // console.log("POOP")
+            console.log("CANCELING AT bootstrap::initialNotification")
+            cancel(initialNotification.notification.id)
+        }
+    }
+
+
+    useEffect(() => {
+        bootstrap()
+            .then(() => setLoading(false))
+            .catch(console.error);
+    }, []);
+
+    useEffect(() => {
+        return notifee.onForegroundEvent(({ type, detail }) => {
+            switch (type) {
+                case EventType.DISMISSED:
+                    console.log('User dismissed notification', detail.notification);
+                    break;
+                case EventType.PRESS:
+                    console.log('User pressed notification', detail.notification);
+                    console.log("CANCELING AT useEffect::EventType.PRESS")
+                    cancel(detail.notification.id)
+                    break;
+            }
+            // cancel(detail.notification.id)
+        });
+    }, []);
+
+    if (loading) {
+        console.log("LOADING...")
+        return <Text>LOADING...</Text>;
+    }
 
     const backgroundStyle = {
         backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
     };
+
+    async function cancel(notificationId) {
+        await notifee.cancelNotification(notificationId);
+    }
 
     async function onDisplayNotification() {
         // Create a channel
@@ -71,14 +140,22 @@ const App: () => Node = () => {
 
         // Display a notification
         await notifee.displayNotification({
+            id: 'abc123',
             title: 'Jonathan Coulton',
             body: 'This was a triumph. I\'m making a note here: HUGE SUCCESS. It\'s hard to overstate my satisfaction.',
             android: {
                 channelId,
                 // smallIcon: 'name-of-a-small-icon', // optional, defaults to 'ic_launcher'.
+                autoCancel: false,
+                // https://notifee.app/react-native/docs/android/interaction
+                pressAction: {
+                    id: 'default'
+                }
             },
         });
     }
+
+
 
     return (
         <SafeAreaView style={backgroundStyle}>
@@ -93,7 +170,13 @@ const App: () => Node = () => {
                     }}>
                     <Section title="Step One">
                         OH HERRO
+                        {'\n'}
                         <Button title="Display Notification???" onPress={() => onDisplayNotification()}/>
+                        {'\n'}
+                        <Button title="Cancel" onPress={() => {
+                            console.log("CANCELING AT return::onPress")
+                            cancel('abc123');
+                        }}/>
                     </Section>
                 </View>
             </ScrollView>
