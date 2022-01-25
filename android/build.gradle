@@ -4,7 +4,10 @@ buildscript {
     ext {
         buildToolsVersion = "30.0.2"
         minSdkVersion = 21
-        compileSdkVersion = 30
+        // This is some bullshit
+        // https://stackoverflow.com/questions/70511000/the-mincompilesdk-31-specified-in-a-dependencys-aar-metadata-this-error-is-s
+        // https://stackoverflow.com/questions/69037481/android-app-wont-build-the-mincompilesdk-31-specified-in-a-dependencys-an
+        compileSdkVersion = 31
         targetSdkVersion = 30
         ndkVersion = "21.4.7075529"
     }
@@ -38,5 +41,9 @@ allprojects {
         }
         google()
         maven { url 'https://www.jitpack.io' }
+        // https://notifee.app/react-native/docs/installation
+        maven {
+            url "$rootDir/../node_modules/@notifee/react-native/android/libs"
+        }
     }
 }
