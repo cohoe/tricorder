@@ -29,10 +29,12 @@ import {
 
 import notifee, {EventType} from '@notifee/react-native';
 
-import { AppRegistry } from 'react-native';
-AppRegistry.registerHeadlessTask('SomeTaskName', () =>
-    require('./tasks/BackgroundPoller.js')
-);
+import BackgroundFetch from "react-native-background-fetch";
+
+
+
+
+
 
 const Section = ({children, title}): Node => {
     const isDarkMode = useColorScheme() === 'dark';
@@ -98,6 +100,34 @@ const App: () => Node = () => {
             console.log("CANCELING AT bootstrap::initialNotification")
             cancel(initialNotification.notification.id)
         }
+    }
+
+    function componentDidMount() {
+        // Initialize BackgroundFetch ONLY ONCE when component mounts.
+        this.initBackgroundFetch();
+    }
+
+    async function initBackgroundFetch() {
+        // BackgroundFetch event handler.
+        const onEvent = async (taskId) => {
+            console.log('[BackgroundFetch] task: ', taskId);
+            // Do your background work...
+            await this.addEvent(taskId);
+            // IMPORTANT:  You must signal to the OS that your task is complete.
+            BackgroundFetch.finish(taskId);
+        }
+
+        // Timeout callback is executed when your Task has exceeded its allowed running-time.
+        // You must stop what you're doing immediately BackgroundFetch.finish(taskId)
+        const onTimeout = async (taskId) => {
+            console.warn('[BackgroundFetch] TIMEOUT task: ', taskId);
+            BackgroundFetch.finish(taskId);
+        }
+
+        // Initialize BackgroundFetch only once when component mounts.
+        let status = await BackgroundFetch.configure({minimumFetchInterval: 15}, onEvent, onTimeout);
+
+        console.log('[BackgroundFetch] configure status: ', status);
     }
 
 
@@ -209,3 +239,6 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+
+import { AppRegistry } from 'react-native';
+AppRegistry.registerComponent('tricorder', () => App);
