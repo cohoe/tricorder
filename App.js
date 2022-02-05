@@ -31,11 +31,6 @@ import notifee, {EventType} from '@notifee/react-native';
 
 import BackgroundFetch from "react-native-background-fetch";
 
-
-
-
-
-
 const Section = ({children, title}): Node => {
     const isDarkMode = useColorScheme() === 'dark';
     return (
@@ -80,6 +75,10 @@ notifee.onBackgroundEvent(async ({type, detail}) => {
         // Remove the notification
         await notifee.cancelNotification(notification.id);
     }
+
+    if (type === EventType.PRESS) {
+        await notifee.cancelNotification(notification.id);
+    }
 });
 
 const App: () => Node = () => {
@@ -102,17 +101,19 @@ const App: () => Node = () => {
         }
     }
 
-    function componentDidMount() {
-        // Initialize BackgroundFetch ONLY ONCE when component mounts.
-        this.initBackgroundFetch();
-    }
+    // function componentDidMount() {
+    //     // Initialize BackgroundFetch ONLY ONCE when component mounts.
+    //     initBackgroundFetch();
+    //     console.log("Background Init'd")
+    // }
 
     async function initBackgroundFetch() {
         // BackgroundFetch event handler.
         const onEvent = async (taskId) => {
             console.log('[BackgroundFetch] task: ', taskId);
             // Do your background work...
-            await this.addEvent(taskId);
+            // await this.addEvent(taskId);
+            await onDisplayNotification()
             // IMPORTANT:  You must signal to the OS that your task is complete.
             BackgroundFetch.finish(taskId);
         }
@@ -135,6 +136,7 @@ const App: () => Node = () => {
         bootstrap()
             .then(() => setLoading(false))
             .catch(console.error);
+        initBackgroundFetch();
     }, []);
 
     useEffect(() => {
