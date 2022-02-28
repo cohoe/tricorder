@@ -18,6 +18,7 @@ import {
   cancel
 } from './twitarr/components/notifications'
 import notifee, {EventType} from '@notifee/react-native';
+import {MainView} from "./twitarr/components/Views/Main";
 
 const App = () => {
 
@@ -50,7 +51,8 @@ const App = () => {
     return <Text>LOADING...</Text>;
   }
 
-  return (<ExampleAppView/>);
+  // return (<ExampleAppView/>);
+  return (<MainView/>)
 };
 
 export default App;
