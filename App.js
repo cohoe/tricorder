@@ -7,7 +7,6 @@
  */
 
 import React, {useState, useEffect} from 'react';
-import type {Node} from 'react';
 import {
     SafeAreaView,
     ScrollView,
@@ -31,7 +30,7 @@ import notifee, {EventType} from '@notifee/react-native';
 
 import BackgroundFetch from "react-native-background-fetch";
 
-const Section = ({children, title}): Node => {
+const Section = ({children, title}) => {
     const isDarkMode = useColorScheme() === 'dark';
     return (
         <View style={styles.sectionContainer}>
@@ -81,7 +80,7 @@ notifee.onBackgroundEvent(async ({type, detail}) => {
     }
 });
 
-const App: () => Node = () => {
+const App = () => {
     const isDarkMode = useColorScheme() === 'dark';
     const [loading, setLoading] = useState(true);
 
